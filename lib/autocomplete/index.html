@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+	<meta charset="utf-8" />
+	<title>Wikinames</title>
+	<link rel="stylesheet" href="awesomplete.css" />
+	<script src="awesomplete.js"></script>
+	<script src="index.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+</head>
+<body>
+<center>
+	<label>
+		Escriba un nombre:<br />
+		<input id="wikiNames" autofocus class="awesomplete" data-list="Ada, Java, JavaScript, Brainfuck, LOLCODE, Node.js, Ruby on Rails" />
+	</label>
+</center>
+	<script>
+	var names="";
+	function getUsersNames(){
+
+		$.getJSON("http://empowerlabs.com/proyectos/trackersAPI/getUsers.php", function(result){
+			$.each(result, function(i, user){
+				names+=user.nombre+",";
+
+			});
+			var input = document.getElementById("wikiNames");
+			var awesomplete = new Awesomplete(input);
+			awesomplete.list=names;
+
+		});
+
+	}
+	$(document).ready(getUsersNames);
+	</script>
+</body>
+</html>

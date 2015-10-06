@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+
+<html ng-app="bitacora-movil">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+  <link rel="apple-touch-icon" href="Ficon.png">
+  <link rel="apple-touch-startup-image" href="sSplash.png">
+  <title>EmpowerBoard</title>
+  <!--Import materialize.css-->
+  <link type="text/css" rel="stylesheet" href="materialize/css/materialize.css" media="screen,projection" />
+
+  <!--Let browser know website is optimized for mobile-->
+  <link rel="stylesheet" href="lib/onsen/css/onsenui.css" />
+  <link rel="stylesheet" href="lib/onsen/css/onsen-css-components.css" />
+  <script src="lib/onsen/js/angular/angular.js"></script>
+  <script src="lib/onsen/js/onsenui.js"></script>
+  <!--Import jQuery before materialize.js-->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="js/js.cookie.js"></script>
+
+  <script type="text/javascript" src="materialize/js/materialize.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Roboto">
+  <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.css">
+
+  <script type="text/javascript" src="js/index.js"></script>
+  <link type="text/css" rel="stylesheet" href="css/index.css" />
+
+</head>
+
+<body ng-controller="body-controller">
+  <ons-tabbar id="tab">
+    <ons-tab page="dashboard.html" class="lighten-2" label="Dashboard" icon="fa fa-cogs"></ons-tab>
+    <ons-tab page="actividades.html" class="lighten-2" label="Gestor" icon="fa fa-cog" active="true"></ons-tab>
+    <ons-tab page="home-chats.html" class="lighten-2" label="Chat" icon="fa fa-comments"></ons-tab>
+    <ons-tab page="notification.html" class="lighten-2" label="Notificaciones" icon="fa fa-bell-o"></ons-tab>
+    <!-- <ons-tab page="login-form.html" class="lighten-2 hidden" label="Notificaciones" icon="fa fa-bell-o"  active="true"></ons-tab> -->
+  </ons-tabbar>
+  <ons-template id="dashboard.html">
+    <ons-navigator>
+    <ons-page ng-controller="ActividadesController">
+      <ons-toolbar class="custom-nav">
+        <div class="left">
+        </div>
+        <div class="center color-blanco">
+          Dashboard Global
+        </div>
+        <div class="right">
+        </div>
+      </ons-toolbar>
+
+      <div class="row" style="height: 16px;  background-color: #90a4ae;">
+        <div class="col s8" style="background-color: #90a4ae;  height: 46px;">
+          <input type="search" id="buscar" style="text-align:center; vertical-align: bottom;  background-color: #90a4ae; color: white" ng-model="entradaActivityDash" placeholder="Buscar">
+        </div>
+        <div class="col s4" style="background-color: #90a4ae; height: 46px;">
+          <input type="date" ng-model='dateTop.value' id="datePicker" style="text-align:center; vertical-align: bottom;  background-color: #90a4ae; float:right" ng-change="changeDate()" />
+        </div>
+      </div>
+      <table style="max-width: 100%;">
+        <thead>
+          <tr>
+            <th data-field="from" ng-click="setOrderDash(6)"><i class="fa fa-user"></i></th>
+            <th data-field="descripcion" ng-click="setOrderDash(0)">Descripcion</th>
+            <th data-field="estatus" ng-click="setOrderDash(1)"><i class="fa fa-pie-chart"></i></th>
+            <th data-field="prioridad" ng-click="setOrderDash(5)"><i class="fa fa-flag"></i></th>
+            <th data-field="ayuda" ng-click="setOrderDash(2)"><i class="fa fa-ambulance"></i></th>
+            <th data-field="reloj" ng-click="setOrderDash(3)"><i class="fa fa-clock-o"></i></th>
+            <th data-field="link"><i class="fa fa-link"></i></th>
+          </tr>
+        </thead>
+
+        <tbody style="font-size: 12px; max-width:100%">
+          <tr ng-repeat="actividadDashboard in actividadesDashboard | filter:dateTop.strVal | filter:entradaActivityDash | orderBy:orderDash">
+            <td><img src="{{findUsuarioURLimage(actividadDashboard.from)}}" style="height: 20px; width: 20px" /></td>
+            <td>
+              <span>{{actividadDashboard.descripcion}}</span>
+            <!-- <span class="timeline-id"></span> -->
+            </td>
+            <td><i class="fa fa-circle {{actividadDashboard.color}} fa-f3"></i></td>
+            <td><i class="fa fa-flag prioridad-{{actividadDashboard.prioridad}} fa-f3"></i></td>
+            <td><img src="{{findUsuarioURLimage(actividadDashboard.para)}}" style="height: 20px; width: 20px" /></td>
+            <td class="timeline-time">
+              {{actividadDashboard.tiempo}} min
+            </td>
+            <td ng-click="lanzarFrame(actividadDashboard.entregable)"><i ng-if="actividadDashboard.entregable!=''"  class="link fa fa-external-link-square"></i></td>
+          </tr>
+        </tbody>
+      </table>
+    </ons-page>
+    </ons-navigator>
+  </ons-template>
+  <ons-modal var="entregable" style="max-height:100%;">
+    <ons-icon icon="ion-load-c" spin="true"></ons-icon>
+    <br><br>
+
+    <iframe ng-src="selectedActividad.entregable" width="100%" height="100%" src="" frameborder="0"></iframe>
+  </ons-modal>
+
+      <ons-template id="webFrame.html">
+        <ons-page ng-controller="FrameController">
+          <ons-toolbar class="custom-nav">
+            <div class="left">
+              <!-- <ons-back-button>
+              </ons-back-button> -->
+              <ons-toolbar-button ng-click="cerrarEntregable()">
+                <ons-icon icon="fa fa-arrow-left color-blanco" ng-click="regresar()"></ons-icon>
+              </ons-toolbar-button>
+            </div>
+            <div class="center color-blanco">
+              <!-- <div class="truncate">{{url}}</div> -->
+              Entregable
+            </div>
+            <div class="right">
+              <!-- <i id="loading" class="fa fa-circle-o-notch fa-spin" style="margin: 15px"></i> -->
+            </div>
+          </ons-toolbar>
+          <iframe id="myframe" src="http://empowerlabs.com/proyectos/webapps/bitacora-movil/img/loading.gif">
+          </iframe>
+        </ons-page>
+      </ons-template>
+  <ons-template id="actividades.html" >
+    <ons-navigator>
+    <ons-page ng-controller="ActividadesController">
+      <ons-toolbar class="custom-nav">
+        <div class="left">
+          <!-- <a class="btn-floating waves-effect waves-light transparent custom-foat-left" ng-click="toggleSortMenu()" style="height: 30px; width: 30px"><i class="fa fa-sort"></i></a> -->
+        </div>
+        <div class="center color-blanco" ng-click="hideSortMenu()" align="center" style="">
+          <!-- {{fecha}} -->
+          EmpowerBoard
+        </div>
+        <div class="right" ng-click="hideSortMenu()">
+          <div class="fixed-action-btn">
+            <div class=" custom-foat">
+              <a class="btn-floating transparent" ng-click="toggleOpcion()" style="height: 30px; width: 30px">
+                <i class="fa fa-ellipsis-v"></i>
+              </a>
+              <ul class="custom-sub-item">
+                <li><a class="btn-floating red" ng-click="llamar()"><i class="fa fa-refresh"></i></a></li>
+                <!-- <li ng-click=""><a class=" btn-floating yellow darken-1"><i class="fa fa-calendar"></i></a></li> -->
+                <!--<li ng-click="lanzarChat()"><a class="btn-floating green"><i class="fa fa-comments"></i></a></li>-->
+                <li ng-click="cerrarOpcion()"><a class="btn-floating purple"><i class="fa fa-sign-out"></i></a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </ons-toolbar>
+      <!-- <div id="sort-menu" class="pop-menu-left blue-grey lighten-2 noMayus">
+        <a class="waves-effect waves-teal btn-flat white-text noMayus" ng-click="setOrder(0)">Actividad</a>
+        <a class="waves-effect waves-teal btn-flat white-text noMayus" ng-click="setOrder(4)">Categoria</a>
+        <a class="waves-effect waves-teal btn-flat white-text noMayus" ng-click="setOrder(1)">Estatus</a>
+        <a class="waves-effect waves-teal btn-flat white-text noMayus" ng-click="setOrder(5)">Prioridad</a>
+      </div> -->
+      <a class="btn-floating btn-large waves-effect waves-light  botonColor" style="position:fixed; bottom:65px; right:20px" ng-click="showModalAlta()"><i class="fa fa-plus"></i></a>
+
+
+      <div id="modal-calendario" class="my-modal">
+        <div class="my-modal-box">
+
+          <div class="header">
+
+            <div class="title" align="center" >
+              Calendario
+            </div>
+            <div class="close-modal">
+              <i class="fa fa-times cerrar" ng-click="closeModalCalendario()"></i>
+            </div>
+
+          </div>
+          <input type="date" class="datepicker">
+        </div><!-- /container -->
+
+      </div>
+    </div>
+
+    <div id="modal-alta" class="my-modal">
+      <div class="my-modal-box">
+
+        <div class="header">
+
+          <div class="title" align="center" >
+            Nueva Actividad
+          </div>
+          <div class="close-modal">
+            <i class="fa fa-times cerrar" ng-click="closeModalAlta()"></i>
+          </div>
+
+        </div>
+
+
+        <div class="container">
+          <form id="form-alta-actividad">
+            <div id="loading" style="display:none; text-align:center;">
+              <i class="fa fa-circle-o-notch fa-spin"></i>
+              <br>subiendo...
+            </div>
+            <div class="form-row input-field">
+              <input type="text" class="col s12" placeholder="Descripcion" name="descripcion">
+            </div>
+
+            <div class="row">
+              <select id="categoria" name="categoria" class="browser-default col s10">
+                <option value="Administrativa">Administrativa</option>
+                <option value="Proyectos">Proyectos</option>
+                <option value="Planeación">Planeacion</option>
+                <option value="Cliente">Cliente</option>
+                <option value="Investigación">Investigacion</option>
+                <option value="Curso">Curso</option>
+                <option value="Programación">Programacion</option>
+                <option value="Junta">Junta</option>
+                <option value="Personal">Personal</option>
+              </select>
+            </div>
+            <div class="row">
+              <select id="prioridad" name="prioridad" class="browser-default col s6">
+                <option value="a">Prioridad</option>
+                <option value="a">Urgente</option>
+                <option value="b">Alta</option>
+                <option value="c">Media</option>
+                <option value="d">Baja</option>
+              </select>
+              <select id="time" name="time" class="browser-default col s6">
+                <option  value="0">Duracion</option>
+                <option  value="5">5 min</option>
+                <option  value="15">15 min</option>
+                <option  value="30">30 min</option>
+                <option  value="45">45 min</option>
+                <option  value="60">60 min</option>
+                <option  value="90">90 min</option>
+                <option  value="120">120 min</option>
+                <option  value="150">150 min</option>
+                <option  value="180">180 min</option>
+              </select>
+            </div>
+            <div class="vspc form-row">
+              <ons-button modifier="large--cta" ng-click="enviarForm()" class="botonColor">Agregar</ons-button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="modal-edit" class="my-modal">
+      <div class="my-modal-box">
+        <div class="header">
+          <div class="title" align="center" >
+            Editar Actividad
+          </div>
+          <div class="close-modal">
+            <i class="fa fa-times cerrar" ng-click="closeModalEdit()"></i>
+          </div>
+        </div>
+        <div class="container" align="center">
+          <form id="form-edit-actividad">
+            <div id="loadingEdit" style="display:none; text-align:center;">
+              <i class="fa fa-circle-o-notch fa-spin"></i>
+              <br>cargando...
+            </div>
+            <div class="row" style="padding-top:5px;">
+              <div class="input-field col s12">
+                <input placeholder="Descripción" type="text" id="descripcion" name="descripcion" data-ng-model="selectedActividad.descripcion">
+                <!-- <label for="descripcion">Descripción</label> -->
+              </div>
+            </div>
+
+            <div class="row  row-input">
+              <select id="categoriaEdit" name="categoria" class="browser-default col s12" data-ng-model="selectedActividad.categoria">
+                <option value="Administrativa">Administrativa</option>
+                <option value="Proyectos">Proyectos</option>
+                <option value="Planeación">Planeacion</option>
+                <option value="Cliente">Cliente</option>
+                <option value="Investigación">Investigacion</option>
+                <option value="Curso">Curso</option>
+                <option value="Programación">Programacion</option>
+                <option value="Junta">Junta</option>
+                <option value="Personal">Personal</option>
+              </select>
+
+            </div>
+
+            <div class="row row-input">
+              <select id="prioridad" name="prioridad" class="browser-default col s4" data-ng-model="selectedActividad.prioridad">
+                <option value="0">Prioridad</option>
+                <option value="a">Urgente</option>
+                <option value="b">Alta</option>
+                <option value="c">Media</option>
+                <option value="d">Baja</option>
+              </select>
+            </div>
+            <div class="row  row-input">
+
+              <select id="time" name="time" class="browser-default col s4" data-ng-model="selectedActividad.tiempo">
+                <option  value="0">Duracion</option>
+                <option  value="5">5 min</option>
+                <option  value="15">15 min</option>
+                <option  value="30">30 min</option>
+                <option  value="45">45 min</option>
+                <option  value="60">60 min</option>
+                <option  value="90">90 min</option>
+                <option  value="120">120 min</option>
+                <option  value="150">150 min</option>
+                <option  value="180">180 min</option>
+              </select>
+              <select id="status" name="estatus" class="browser-default col s4" data-ng-model="selectedActividad.estatus">
+                <option  value="0">Estatus</option>
+                <option  value="20">20 %</option>
+                <option  value="50">50 %</option>
+                <option  value="75">75 %</option>
+                <option  value="100">100 %</option>
+
+              </select>
+            </div>
+
+            <div class="row row-input" style="margin-top:-35px;">
+              <div class="input-field col s12">
+                <input id="obstaculos" type="text" name="obstaculos" placeholder="Comentarios" data-ng-model="selectedActividad.obstaculos"/>
+                <!-- <label for="obstaculos">Comentarios</label> -->
+              </div>
+            </div>
+
+            <div class="row  row-input">
+
+              <div class="input-field col s6">
+                <input placeholder="Ayuda" type="text" id="para" name="para" data-list="" data-ng-model="selectedActividad.para" />
+                <!-- <label for="para">Ayuda</label> -->
+              </div>
+
+              <div class="input-field col s6">
+                <input placeholder="Lab" type="text" id="lab" name="lab"  data-ng-model="selectedActividad.lab"  />
+                <!-- <label for="lab">Lab</label> -->
+              </div>
+            </div>
+
+            <div class="row  row-input">
+              <div class="input-field col s12">
+                <input placeholder="URL del Entregable" type="text" id="entregable" name="entregable"  data-ng-model="selectedActividad.entregable" />
+                <!-- <label for="entregable">URL del Entregable</label> -->
+              </div>
+            </div>
+
+            <div class="row-input input-field" style="margin-top:25px;">
+              <label for="dateEdit">Fecha:</label><br>
+              <input type="date" id="dateEdit" style="text-align:center; vertical-align: bottom; color: #000;" name="date" />
+
+            </div>
+
+          </div>
+          <div class="vspc form-row" style="margin-top:40px;">
+            <ons-button modifier="large--cta" ng-click="onUpdate()" class="botonColor">Editar</ons-button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="row" style="height: 16px;  background-color: #90a4ae;">
+    <div class="col s8" style="background-color: #90a4ae;  height: 46px;">
+      <input type="search" id="buscar" style="text-align:center; vertical-align: bottom;  background-color: #90a4ae; color: white" ng-model="entradaActivity" placeholder="Buscar">
+    </div>
+    <div class="col s4" style="background-color: #90a4ae; height: 46px;">
+      <input type="date" ng-model='dateTop.value' id="datePicker" style="text-align:center; vertical-align: bottom;  background-color: #90a4ae; float:right" ng-change="changeDate()" />
+    </div>
+  </div>
+  <table ng-click="hideSortMenu()" style="max-width: 100%; margin-bottom:30px;">
+    <thead>
+      <tr>
+        <th></th>
+        <th data-field="descripcion" ng-click="setOrder(0)">Descripcion</th>
+        <th data-field="estatus" ng-click="setOrder(1)"><i class="fa fa-pie-chart"></i></th>
+        <th data-field="prioridad" ng-click="setOrder(5)"><i class="fa fa-flag"></i></th>
+        <th data-field="ayuda" ng-click="setOrder(2)"><i class="fa fa-ambulance"></i></th>
+        <th data-field="reloj" ng-click="setOrder(3)"><i class="fa fa-clock-o"></i></th>
+        <th data-field="autor"><i class="fa fa-link"></i></th>
+      </tr>
+    </thead>
+    <tbody>
+    <tr id="{{actividad.id}}"  ng-repeat="actividad in actividades.detail | filter:dateTop.strVal | filter:entradaActivity | orderBy: order">
+          <td ng-click="editActivity(actividad.id)"><i class="fa fa-edit"></i></td>
+          <td ng-click="">
+            <span class="timeline-time">{{actividad.descripcion}}</span>
+          <!-- <span class="timeline-id"></span> -->
+          </td>
+          <td><i class="fa fa-circle {{actividad.color}} fa-f3"></i></td>
+          <td><i class="fa fa-flag prioridad-{{actividad.prioridad}} fa-f3"></i></td>
+          <td><img src="{{findUsuarioURLimage(actividad.para)}}" style="height: 20px; width: 20px" /></td>
+          <td class="timeline-time">
+            {{actividad.tiempo}} min
+          </td>
+          <td ng-click="lanzarFrame(actividad.entregable)"><i  ng-if="actividad.entregable!=''"  class="link fa fa-external-link-square"></i></td>
+    </tr>
+  </tbody>
+  </table>
+</ons-page>
+</ons-navigator>
+</ons-template>
+<ons-template id="popover.html">
+  <ons-popover direction="up down" cancelable>
+    <div style="text-align: center; opacity: 0.5;">
+      <p>This is a popover!</p>
+      <p>
+        <small>Click the background to remove the popover.</small>
+      </p>
+    </div>
+  </ons-popover>
+</ons-template>
+<ons-template id="calendario.html">
+  <ons-page>
+    <ons-toolbar class="custom-nav">
+      <div class="left">
+        <ons-toolbar-button ng-click="regresar()">
+          <ons-icon icon="ion-arrow-shrink color-blanco"></ons-icon>
+        </ons-toolbar-button>
+      </div>
+      <div class="center color-blanco">
+        5 Septiembre
+      </div>
+      <div class="right">
+      </div>
+    </ons-toolbar>
+    <div style="display:block; height:15px;"></div>
+    <div class="container">
+    </div>
+  </ons-page>
+</ons-template>
+<ons-template id="home-chats.html">
+  <ons-navigator >
+    <ons-page>
+      <ons-toolbar class="custom-nav">
+        <div class="left">
+        </div>
+        <div class="center color-blanco">
+          EmpowerChat
+        </div>
+        <div class="right">
+        </div>
+      </ons-toolbar>
+      <ons-tabbar position="top">
+        <ons-tab page="chat.html" label="Recientes" active="true"></ons-tab>
+        <ons-tab page="favoritos.html" label="Favoritos"></ons-tab>
+        <ons-tab page="contactos.html" label="Contactos"></ons-tab>
+      </ons-tabbar>
+    </ons-tabbar>
+  </ons-page>
+</ons-navigator>
+</ons-template>
+<ons-template id="chat.html">
+  <ons-page ng-controller="ChatController">
+    <ul class="collection">
+      <li class="collection-item avatar" ng-repeat="conversacion in conversaciones.detail" ng-click="lanzarConversacion(conversacion)">
+        <img src="{{findUsuarioURLimage(conversacion.nombre)}}" alt="" class="circle">
+        <span class="title">{{conversacion.nombre}}</span>
+        <p class="timeline-id">
+          <br> {{conversacion.last_mensaje}}
+        </p>
+        <div class="timeline-date" style="position: absolute; float: right; top: 5px; right: 15px">{{conversacion.date}}</div>
+      </li>
+    </ul>
+  </ons-page>
+</ons-template>
+<ons-template id="conversacion.html">
+  <ons-page ng-controller="ConversacionController">
+    <ons-toolbar class="custom-nav">
+      <div class="left">
+        <ons-toolbar-button ng-click="regresar()">
+          <ons-icon icon="fa fa-arrow-left color-blanco"></ons-icon>
+        </ons-toolbar-button>
+      </div>
+      <div class="center color-blanco">
+        <span style="font-size:bolder; text-height: 12px"> {{selectedTarget}} </span>
+      </div>
+      <div class="right">
+      </div>
+    </ons-toolbar>
+    <ul class="chat">
+
+      <li ng-repeat="chat in selectedChat">
+        <div class="bubble you" ng-if="user2==chat.from">
+          {{chat.message}}
+          <img src="{{findUsuarioURLimage(chat.from)}}" alt="" class="circle" style="width:20px; height:20px; position: absolute; bottom:-10px; right: -5px">
+          <div class="timeline-date">{{chat.time}}</div>
+        </div>
+        <div class="bubble me" ng-if="user2!=chat.from">
+          {{chat.message}}
+          <img src="{{findUsuarioURLimage(chat.from)}}" alt="" class="circle" style="width:20px; height:20px; position: absolute; top:-10px; left: -5px">
+          <div class="timeline-date">{{chat.time}}</div>
+        </div>
+      </li>
+    </ul>
+    <ons-bottom-toolbar>
+      <div class="center" style="width: 100%;">
+        <ons-toolbar-button style="width: 15%; text-align:center;">
+          <a class="btn-floating waves-effect waves-light blue" style="bottom:10px">
+            <i class="fa fa-paperclip"></i>
+          </a>
+        </ons-toolbar-button>
+        <input type="text" id="textNuevo" placeholder="Type your message here !!" style="width: 60%; bottom:10px">
+        <ons-toolbar-button style="width: 15%; text-align:right" ng-click="sendMessage()">
+          <a class="btn-floating waves-effect waves-light green" style="text-align:center; bottom: 10px">
+            <i class="fa fa-send"></i>
+          </a>
+        </ons-toolbar-button>
+      </div>
+    </ons-bottom-toolbar>
+  </ons-page>
+</ons-template>
+<ons-template id="favoritos.html">
+  <ons-page ng-controller="FavoritosController">
+    <div class="row" ng-repeat="favorito in favoritos.detail" ng-click="lanzarConversacionFavoritos(favorito.nombre)">
+      <div class="col s12">
+        <img style="height: 40px; width: 40px;" src="{{findUsuarioURLimage(favorito.nombre)}}" class="circle" />
+        <span>{{favorito.nombre}}</span>
+      </div>
+    </div>
+  </ons-page>
+</ons-template>
+<ons-template id="contactos.html">
+  <ons-page ng-controller="ContactosController">
+    <input id="enter" type="search" style="width: 96%; margin: 6px auto 6px auto;" placeholder="Buscar" ng-model="entradaName">
+    <div class="row" data-badge="1" ng-repeat="item in usuarios | filter: user | filter: entradaName" id="side{{item.nombre}}">
+      <!-- Pass username and display name to register popup -->
+      <div class="col s3" ng-click="lanzarConversacionContactos(item.nombre)">
+        <img src="{{item.image}}" style="height:40px; width:40px" class="circle" />
+        <span>{{item.nombre}}</span>
+      </div>
+    </div>
+  </div>
+</ons-page>
+</ons-template>
+<ons-template id="notification.html">
+  <ons-page>
+    <ons-toolbar class="custom-nav">
+      <div class="center color-blanco">Notificaciones</div>
+    </ons-toolbar>
+
+    <ons-list class="" id="notificaciones"  ng-click="hideSortMenu()" >
+      <ons-list-item  class="timeline-li" ng-repeat="notificacion in notificaciones">
+        <ons-row style="margin-bottom:4px;">
+          <ons-col width="40px">
+            <img src="{{notificacion.foto}}" alt="">
+          </ons-col>
+          <ons-col>
+            {{notificacion.mensaje}}<br>
+            <div class="fechaNoti">
+              {{notificacion.fecha}} - {{notificacion.hora}}
+            </div>
+          </ons-col>
+        </ons-row>
+      </ons-list-item>
+    </ons-list>
+  </ons-page>
+</ons-template>
+</body>
+</html>

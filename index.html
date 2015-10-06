@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" ng-app="bitacora-login">
+<head>
+  <meta charset="UTF-8">
+  <title>EmpowerBoard Login</title>
+  <!--Import materialize.css-->
+  <link type="text/css" rel="stylesheet" href="materialize/css/materialize.css" media="screen,projection" />
+
+  <!--Let browser know website is optimized for mobile-->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <script src="lib/onsen/js/angular/angular.js"></script>
+
+
+
+  <!--Import jQuery before materialize.js-->
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script type="text/javascript" src="materialize/js/materialize.js"></script>
+  <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Roboto">
+  <link rel="stylesheet" type="text/css" href="font-awesome/css/font-awesome.css">
+  <link rel="stylesheet" href="css/login.css">
+
+  <script type="text/javascript" src="js/index-login.js"></script>
+  <script src="js/js.cookie.js"></script>
+
+  <link type="text/css" rel="stylesheet" href="css/index.css" />
+</head>
+<body ng-controller="login-controller"  data-ng-init="init()">
+  <div class="header" align="center">
+    <span  style="font-size:15px; color:#fff;" >Iniciar Sesión</span>
+  </div>
+
+  <br><br>
+  <br><br>
+  <div class="login-form container">
+    <form id="form-signup">
+      <div id="loadingSignup" style="display:none; text-align:center;">
+        <i class="fa fa-circle-o-notch fa-spin"></i>
+        <br>Iniciando...
+      </div>
+      <div class="input-field">
+        <input id="wikiname" name="wikiname" type="text" class="validate">
+        <label for="wikiname">Wikiname</label>
+      </div>
+      <div class="input-field">
+        <input id="pass" name="password" type="password" class="validate">
+        <label for="pass">Contraseña</label>
+      </div>        <br>
+      <button class="btn waves-effect waves-light botonColor" style="height:44px; text-transform: none; width:100%;" ng-click="OnSignUp()">Entrar</button>
+      <br><br>
+      <button class="btn waves-effect waves-light botonColor" style="height:44px; text-transform: none; width:100%;" ng-click="showModalRegister()" >Registrarse</button>
+    </form>
+  </div>
+
+
+  <!-- Modal Structure -->
+  <div id="loginModal" class="modal">
+    <div class="modal-content">
+      <div class="header">
+        <div class="title" align="center" >
+          Registro
+        </div>
+        <div class="close-modal">
+          <i class="fa fa-times cerrar" ng-click="closeModalRegister()"></i>
+        </div>
+      </div>
+      <form id="form-alta-usuario" style="padding: 10px;">
+        <div id="loadingRegister" style="display:none; text-align:center;">
+          <i class="fa fa-circle-o-notch fa-spin"></i>
+          <br>registrando...
+        </div>
+
+        <div class="input-field">
+          <input id="wikiname-register" name="wikiname" type="text" class="validate">
+          <label for="wikiname-register">Wikiname</label>
+        </div>
+        <div class="input-field">
+          <input id="pass-register" name="password" type="password" class="validate">
+          <label for="pass-register">Contraseña</label>
+        </div>
+<br><br>
+        <a ng-click="onRegister()" href="#!" class="botonColor modal-action modal-close waves-effect waves-light btn " style="width:100%; height:44px; text-transform: none;">Registrar</a>
+
+      </form>
+
+    </div>
+
+  </div>
+
+
+</body>
+</html>
